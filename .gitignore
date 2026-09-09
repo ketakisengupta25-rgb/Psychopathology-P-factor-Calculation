@@ -1,0 +1,40 @@
+# Raw participant data
+data/raw/*
+!data/raw/.gitkeep
+
+# Analysis outputs
+outputs/*
+!outputs/.gitkeep
+
+# Excel/data files
+*.xlsx
+*.xls
+*.csv
+
+# Serialized models
+*.pkl
+*.pickle
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# PyCharm / VS Code
+.idea/
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

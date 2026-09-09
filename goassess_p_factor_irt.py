@@ -1,13 +1,12 @@
 """
 GOASSESS p-Factor Bifactor IRT Pipeline
-=======================================
 
 This script prepares GOASSESS questionnaire data, performs response-quality
 screening, fits a confirmatory bifactor item response theory model, estimates
 participant factor scores, and exports factor loadings and model datasets.
 
 Model structure
----------------
+
 - General factor: p factor loading on all 112 modeled items
 - Specific factor 1: first 37 items
 - Specific factor 2: next 25 items
@@ -35,9 +34,9 @@ from mirt import BifactorModel
 from mirt.estimation import QMCEMEstimator
 
 
-# =============================================================================
+
 # CONFIGURATION
-# =============================================================================
+
 
 DATA_FILE = Path("data/raw/goassess.xlsx")
 OUTPUT_DIR = Path("outputs")
@@ -141,9 +140,9 @@ SPECIFIC_FACTORS = np.array(
 )
 
 
-# =============================================================================
+
 # DATA LOADING AND VALIDATION
-# =============================================================================
+
 
 def load_data(file_path: Path) -> pd.DataFrame:
     """Load GOASSESS data from an Excel or CSV file."""
@@ -177,9 +176,8 @@ def validate_required_columns(data: pd.DataFrame) -> None:
         )
 
 
-# =============================================================================
+
 # RESPONSE-QUALITY SCREENING
-# =============================================================================
 
 def filter_attention_checks(data: pd.DataFrame) -> pd.DataFrame:
     """Keep only participants who answered all catch questions correctly."""
@@ -311,9 +309,8 @@ def calculate_mahalanobis_qc(data: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-# =============================================================================
+
 # SCORING AND MODEL PREPARATION
-# =============================================================================
 
 def reverse_score_items(data: pd.DataFrame) -> pd.DataFrame:
     """
@@ -372,10 +369,7 @@ def to_binary_zero_one(p_data: pd.DataFrame) -> np.ndarray:
 
     return p_data.to_numpy(dtype=int) - 1
 
-
-# =============================================================================
 # BIFACTOR IRT
-# =============================================================================
 
 def fit_bifactor_model(responses: np.ndarray):
     """Fit the four-specific-factor bifactor IRT model using QMCEM."""
@@ -476,9 +470,7 @@ def extract_factor_loadings(model: BifactorModel) -> pd.DataFrame:
     return loadings
 
 
-# =============================================================================
 # EXPORT
-# =============================================================================
 
 def save_outputs(
     original_data: pd.DataFrame,
@@ -549,9 +541,8 @@ def save_outputs(
             print(f"  - {path}")
 
 
-# =============================================================================
+
 # MAIN PIPELINE
-# =============================================================================
 
 def main() -> None:
     """Run the complete GOASSESS p-factor IRT analysis."""
@@ -560,14 +551,14 @@ def main() -> None:
 
     validate_required_columns(raw_data)
 
-    # -------------------------------------------------------------------------
+    
     # Attention checks
-    # -------------------------------------------------------------------------
+    
     goassess = filter_attention_checks(raw_data)
 
-    # -------------------------------------------------------------------------
+    
     # Numeric conversion and SIP recoding
-    # -------------------------------------------------------------------------
+    
     goassess = convert_item_columns_to_numeric(goassess)
     goassess = recode_sip_items(goassess)
 
@@ -581,18 +572,18 @@ def main() -> None:
     # Store the scored-but-not-reversed version for export.
     goassess_original = goassess.copy()
 
-    # -------------------------------------------------------------------------
+    
     # Long-string quality control
-    # -------------------------------------------------------------------------
+    
     goassess_lsi = add_long_string_index(goassess)
 
     mean_lsi = goassess_lsi["Long_String_Index"].mean()
 
     print(f"Mean Long String Index: {mean_lsi:.2f}")
 
-    # -------------------------------------------------------------------------
+    
     # Mahalanobis quality control
-    # -------------------------------------------------------------------------
+    
     mahalanobis_qc = calculate_mahalanobis_qc(goassess)
 
     qc_data = mahalanobis_qc.merge(
@@ -607,9 +598,9 @@ def main() -> None:
         qc_data["Long_String_Index"] > LONG_STRING_MAX
     )
 
-    # -------------------------------------------------------------------------
+    
     # Apply participant exclusions
-    # -------------------------------------------------------------------------
+    
     keep_mask = goassess_lsi["Long_String_Index"] <= LONG_STRING_MAX
 
     if EXCLUDE_MAHALANOBIS_OUTLIERS:
@@ -638,17 +629,17 @@ def main() -> None:
     # Align exported original data with the model sample.
     goassess_original_clean = goassess_clean.copy()
 
-    # -------------------------------------------------------------------------
+    
     # Reverse scoring and item renaming
-    # -------------------------------------------------------------------------
+    
     goassess_reversed = reverse_score_items(goassess_clean)
 
     goassess_original_named = rename_items(goassess_original_clean)
     goassess_reversed_named = rename_items(goassess_reversed)
 
-    # -------------------------------------------------------------------------
+    
     # Create p-factor response matrix
-    # -------------------------------------------------------------------------
+    
     p_data = create_p_factor_matrix(goassess_reversed_named)
 
     responses = to_binary_zero_one(p_data)
@@ -658,17 +649,17 @@ def main() -> None:
         f"{responses.shape[1]} items."
     )
 
-    # -------------------------------------------------------------------------
+    
     # Fit bifactor model
-    # -------------------------------------------------------------------------
+    
     fit_result = fit_bifactor_model(responses)
 
     print("\nModel fitting complete.")
     print(fit_result.summary())
 
-    # -------------------------------------------------------------------------
+    
     # Export results
-    # -------------------------------------------------------------------------
+    
     save_outputs(
         original_data=goassess_original_named,
         reversed_data=goassess_reversed_named,

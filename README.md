@@ -44,7 +44,6 @@ Participant factor scores are calculated as expected-a-posteriori (**EAP**) esti
 
 ## Repository structure
 
-```text
 goassess-p-factor-irt/
 │
 ├── goassess_p_factor_irt.py
@@ -56,7 +55,6 @@ goassess-p-factor-irt/
 │   └── raw/
 │
 └── outputs/
-```
 
 ## Requirements
 
@@ -69,9 +67,7 @@ goassess-p-factor-irt/
 
 Install the required packages with:
 
-```bash
 pip install -r requirements.txt
-```
 
 ## Input data
 
@@ -79,17 +75,14 @@ Raw participant data are not included in this repository.
 
 Place the GOASSESS dataset in:
 
-```text
 data/raw/goassess.xlsx
-```
+
 
 The questionnaire is expected to contain a participant identifier in the first column and the original question columns (`Q1`, `Q2`, etc.) used by the analysis.
 
 If the input filename is different, edit:
 
-```python
 DATA_FILE = Path("data/raw/goassess.xlsx")
-```
 
 near the top of `goassess_p_factor_irt.py`.
 
@@ -97,9 +90,9 @@ near the top of `goassess_p_factor_irt.py`.
 
 From the repository root, run:
 
-```bash
+
 python goassess_p_factor_irt.py
-```
+
 
 Model estimation can be computationally intensive because the bifactor model contains five latent dimensions and 112 items.
 
@@ -107,14 +100,14 @@ Model estimation can be computationally intensive because the bifactor model con
 
 The script creates the following files in `outputs/`:
 
-```text
+
 Goassess_factor_scores_final_reversed.xlsx
 Goassess_factor_loadings_final_reversed.xlsx
 Model_data_reversed.xlsx
 Model_data_original.xlsx
 Response_quality_statistics.xlsx
 goassess_p_bifactor_model_reversed.pkl
-```
+
 
 ### Factor scores
 
@@ -143,14 +136,5 @@ goassess_p_bifactor_model_reversed.pkl
 
 By default, Mahalanobis outliers are **flagged but not excluded** from model estimation. This behavior can be changed in the configuration section:
 
-```python
 EXCLUDE_MAHALANOBIS_OUTLIERS = True
-```
 
-## Data privacy
-
-Raw questionnaire data, model outputs, Excel files, and serialized fitted models are excluded from version control through `.gitignore`. Participant-level datasets should not be committed to a public repository.
-
-## Author
-
-Ketaki Sengupta
